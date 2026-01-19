@@ -4,7 +4,7 @@ import { generate } from './generate.js';
 import { execSync } from 'child_process';
 
 program
-  .name('commit-msg-ai')
+  .name('ai-commit')
   .option('-m, --model <model>', 'model name', 'gpt-3.5-turbo')
   .option('-p, --prompt <ver>', 'prompt version', 'A')
   .action(async (opts) => {
