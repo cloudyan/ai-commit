@@ -1,0 +1,23 @@
+{
+  "name": "ai-commit",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "eval": "tsx src/evaluate/run.ts",
+    "eval:compare": "tsx src/evaluate/run.ts --compare"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
+    "@ai-sdk/openai-compatible": "^2.0.13",
+    "ai": "^6.0.39",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "fast-csv": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.15.0",
+    "typescript": "^5.4.0"
+  }
+}

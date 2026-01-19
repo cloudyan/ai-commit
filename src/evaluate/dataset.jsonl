@@ -1,0 +1,2 @@
+{"diff":"@@ -1 +1 @@\\n- const API='sk-123'\\n+ const API=process.env.API","ground_truth":"feat: load API key from env","type":"feat","breaking":false}
+{"diff":"@@ -6,7 +6,6 @@\\n- console.log('debug')\\n+ // removed debug log","ground_truth":"chore: remove debug log","type":"chore","breaking":false}
