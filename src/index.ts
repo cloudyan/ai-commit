@@ -3,11 +3,13 @@ import { program } from 'commander';
 import { generate } from './generate.js';
 import { getStagedDiff, getLastCommitDiff, isGitRepository, gitCommit } from './utils/git.js';
 import { config } from './config.js';
+import { getDefaultLanguage } from './utils.js';
 
 program
   .name('ai-commit')
   .option('-m, --model <model>', 'model name', config.modelName())
   .option('-p, --prompt <ver>', 'prompt version', config.promptVersion())
+  .option('-l, --language <lang>', 'language for commit message (zh or en)', getDefaultLanguage())
   .option('--amend', '修改上一次提交的message')
   .option('-d, --diff <diff>', '直接提供diff内容（开发测试用，跳过git操作）')
   .option('-f, --diff-file <file>', '从文件读取diff内容（开发测试用，跳过git操作）')
@@ -66,9 +68,14 @@ program
         }
         return;
       }
-      
+
       console.log(`正在生成提交信息${opts.amend ? '(修改模式)' : ''}...`);
-      const msg = await generate(diff, opts.model, opts.prompt as 'prompt_A' | 'prompt_B' | 'prompt_C');
+      const msg = await generate({
+        diff,
+        model: opts.model,
+        promptVer: opts.prompt as 'prompt_A' | 'prompt_B' | 'prompt_C',
+        language: opts.language,
+      });
 
       const fullMessage = msg.body ? `${msg.subject}\n\n${msg.body}` : msg.subject;
 
@@ -104,7 +111,9 @@ program
         console.log('\n提示: 如果满意，可以使用以下命令提交:');
         console.log('  git commit -F -');
       }
-      
+
+      console.log(`\n当前模型: ${opts.model}, Prompt版本: ${opts.prompt}`);
+
     } catch (error) {
       console.error('错误:', error instanceof Error ? error.message : '生成提交信息失败');
       process.exit(1);

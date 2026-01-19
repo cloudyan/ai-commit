@@ -1,0 +1,7 @@
+@@ -10,12 +10,6 @@
+- export function getUser() {
+-   return null;
+- }
++ export function getUser() {
++   return userCache.get(id);
++ }

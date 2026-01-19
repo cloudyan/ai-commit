@@ -1,0 +1,5 @@
+@@ -5,8 +5,9 @@
+  * @param {string} id - User ID
+  * @returns {User} User object
+  */
+ export function getUser(id) {}

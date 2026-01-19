@@ -71,8 +71,6 @@ web_modules/
 !.env.example
 
 # test samples
-test-samples/
-test-diff.txt
 my-test.txt
 temp-diff.txt
 

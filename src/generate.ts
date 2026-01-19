@@ -18,6 +18,13 @@ interface CommitMsg {
   reason?: string;
 }
 
+interface GenerateOptions {
+  diff: string;
+  model?: string;
+  promptVer?: 'prompt_A' | 'prompt_B' | 'prompt_C';
+  language?: string;
+}
+
 const openai = createOpenAICompatible({
   name: 'iflow',
   apiKey: config.openaiApiKey(),
@@ -27,17 +34,24 @@ const openai = createOpenAICompatible({
   },
 });
 
-export async function generate(
-  diff: string,
+export async function generate({
+  diff,
   model = config.modelName(),
-  promptVer: 'prompt_A' | 'prompt_B' | 'prompt_C' = config.promptVersion() as any
-): Promise<CommitMsg> {
+  promptVer = config.promptVersion() as any,
+  language = 'zh'
+}: GenerateOptions): Promise<CommitMsg> {
   // 验证prompt版本
   if (!prompts[promptVer]) {
     throw new Error(`不支持的prompt版本: ${promptVer}，支持的版本: prompt_A, prompt_B, prompt_C`);
   }
 
-  const prompt = prompts[promptVer].replace('{{diff}}', diff);
+  const languageMap: Record<string, string> = {
+    'zh': '中文',
+    'en': 'English',
+  };
+  language = languageMap[language] || '中文';
+
+  const prompt = `- Use ${language} for the description. \n\n` + prompts[promptVer].replace('{{diff}}', diff);
 
   try {
     const { text } = await generateText({

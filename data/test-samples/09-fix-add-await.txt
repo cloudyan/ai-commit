@@ -1,0 +1,9 @@
+@@ -8,12 +8,6 @@
+- async function fetchData() {
+-   const response = await fetch(url);
+-   return response.json();
+- }
++ async function fetchData() {
++   const response = await fetch(url);
++   return await response.json();
++ }

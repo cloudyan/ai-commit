@@ -11,15 +11,29 @@
 npm run dev
 # 指定模型和 prompt 版本
 npm run dev -- --model gpt-4o --prompt B
+# 开发模式：直接提供 diff / 从文件读取 diff（跳过 git 操作）
+npm run dev -- --diff "your diff here"
+npm run dev -- --diff-file path/to/diff.txt
+# 修改上一次提交的 message
+npm run dev -- --amend
 
 # 评估单个组合
 npm run eval
-
 # A/B 对比（自动选择最优组合）
 npm run eval:compare
+
+# 构建
+npm run build
+# 类型检查（推荐）
+npm run typecheck
+
+# 测试（自定义框架，基于 node:assert）
+npm run test              # 运行所有测试
+npm run test:utils        # 仅运行工具函数测试
+npm run test:generate     # 仅运行生成逻辑测试
 ```
 
-**注意**：此项目不使用传统的单元测试框架（如 Jest/Vitest），而是通过评估脚本（`src/evaluate/run.ts`）进行端到端的模型输出质量验证。
+**测试说明**：项目使用自定义测试框架（`tests/utils.test.ts` 和 `tests/generate.test.ts`），基于 `node:assert` 实现。评估脚本（`evaluate/run.ts`）用于端到端的模型输出质量验证。
 
 ---
 
@@ -61,16 +75,38 @@ interface CommitMsg {
 ### 错误处理
 
 ```typescript
+// 简单返回
 if (!diff) return console.log('No staged changes.');
-// 使用 Promise reject 处理异步错误，避免空 catch 块
+
+// 异步错误处理：try-catch + instanceof Error
+try {
+  await someOperation();
+} catch (error) {
+  console.error('错误:', error instanceof Error ? error.message : '未知错误');
+  process.exit(1);
+}
 ```
 
 ### 异步代码
 
 ```typescript
 // 优先 async/await
-export async function generate(diff: string, model = 'gpt-3.5-turbo'): Promise<CommitMsg>
+export async function generate({
+  diff: string,
+  model = 'gpt-3.5-turbo',
+}): Promise<CommitMsg>
 // 文件流操作使用 Promise 包装
+```
+
+### 断言与测试
+
+```typescript
+// 使用 node:assert 进行断言
+import assert from 'node:assert';
+
+// 测试中使用
+assert.strictEqual(result.hasSecrets, true);
+assert.ok(result.formattedSubject.length <= 50);
 ```
 
 ### 注释与安全
@@ -88,16 +124,27 @@ export async function generate(diff: string, model = 'gpt-3.5-turbo'): Promise<C
 src/
 ├── index.ts          # CLI 入口，使用 commander 解析参数
 ├── generate.ts       # 核心生成逻辑，基于 ai-sdk 调用模型
-├── prompt.ts         # Prompt 模板管理（支持 A/B 版本）
-└── evaluate/
-    └── run.ts        # 评估脚本，按 Style/Semantic/Safety 三维度打分
+├── prompt.ts         # Prompt 模板管理（支持 A/B/C 版本）
+├── config.ts         # 环境变量配置管理
+├── utils.ts          # 工具函数（敏感信息检测、消息格式化、重试等）
+├── utils/
+│   ├── git.ts        # Git 操作封装（获取 diff、提交等）
+│   └── execFileNoThrow.ts
+tests/
+├── utils.test.ts     # 工具函数测试
+└── generate.test.ts  # 生成逻辑测试
+evaluate/
+└── run.ts            # 评估脚本，按 Style/Semantic/Safety 三维度打分
 ```
 
 ### 核心模块职责
 
 - **CLI**：执行 `git diff --cached`，调用 `generate()` 并输出结果
 - **Generate**：组装 prompt，调用模型，解析 JSON 返回 `CommitMsg` 对象
-- **Prompt**：管理不同版本的 prompt 模板
+- **Prompt**：管理不同版本的 prompt 模板（prompt_A / prompt_B / prompt_C）
+- **Config**：通过 dotenv 加载环境变量，提供配置访问接口
+- **Utils**：敏感信息检测、提交信息格式化、重试机制等
+- **Tests**：使用自定义测试框架，基于 `node:assert`
 - **Evaluate**：批量调用模型进行 A/B 对比和评分
 
 ---
@@ -108,8 +155,9 @@ src/
 |------|------|------|
 | 模型接口 | `@ai-sdk/openai-compatible` + `ai` | 官方推荐，支持 OpenAI/Claude/DeepSeek 等任意兼容接口 |
 | CLI 解析 | `commander` | 轻量、易用、Node.js 标准 |
-| CSV 处理 | `fast-csv` | 流式处理，适合大型数据集 |
 | 运行时 | `tsx` | 直接运行 TypeScript，无需编译步骤 |
+| 断言库 | `node:assert` | 内置模块 |
+| 测试框架 | 自定义轻量级 | 基于 `test()` + `node:assert`，非 Jest/Vitest |
 
 ---
 
