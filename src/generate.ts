@@ -51,7 +51,9 @@ export async function generate({
   };
   language = languageMap[language] || '中文';
 
-  const prompt = `- Use ${language} for the description. \n\n` + prompts[promptVer].replace('{{diff}}', diff);
+  const prompt = prompts[promptVer]
+    .replace('{{language}}', language)
+    .replace('{{diff}}', diff);
 
   try {
     const { text } = await generateText({

@@ -95,7 +95,7 @@ async function evaluate(model: string, promptVer: 'prompt_A' | 'prompt_B' | 'pro
       totalProcessed++;
 
       // 显示进度
-      if ((i + 1) % 10 === 0) {
+      if ((i + 1) % 2 === 0) {
         console.log(`  进度: ${i + 1}/${data.length}`);
       }
 
@@ -122,11 +122,17 @@ async function evaluate(model: string, promptVer: 'prompt_A' | 'prompt_B' | 'pro
   return results;
 }
 
-(async () => {
+type PromptVersion = 'prompt_A' | 'prompt_B' | 'prompt_C';
+
+;(async () => {
   try {
     const compare = process.argv.includes('--compare');
     const models = [config.modelName()];
-    const versions: ('prompt_A' | 'prompt_B' | 'prompt_C')[] = ['prompt_A', 'prompt_B', 'prompt_C'];
+    const versions: PromptVersion[] = [
+      // 'prompt_A',
+      'prompt_B',
+      // 'prompt_C',
+    ];
     const table: any[] = [];
 
     console.log(`使用模型: ${models.join(', ')}`);

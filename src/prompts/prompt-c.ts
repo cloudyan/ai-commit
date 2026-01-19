@@ -7,6 +7,7 @@ export const commitPrompt =
 - 描述: 祈使语气，不超过50字符
 - 正文: 可选，详细说明，每行最多72字符
 - 脚注: 可选，BREAKING CHANGE 注明破坏性变更
+- 使用 {{language}} 作为输出语言
 
 示例:
 feat(auth): add OAuth2 login support

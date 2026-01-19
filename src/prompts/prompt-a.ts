@@ -7,6 +7,7 @@ export const commitPrompt =
 3. 以正确的类型开头：feat, fix, docs, style, refactor, test, chore
 4. 不要使用冗余词汇，如 "updated"、"modified"、"changed"
 5. 具体说明改动了什么
+6. 使用 {{language}} 作为输出语言
 
 对于给定的 diff，仅输出有效的 JSON，格式如下:
 {"subject":"你的提交信息（不超过50字符）","body":"详细说明（如果需要的话），每行最多72字符","breaking":false,"score":85,"reason":"简要说明你的选择"}
