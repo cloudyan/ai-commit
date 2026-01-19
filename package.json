@@ -4,16 +4,24 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "eval": "tsx src/evaluate/run.ts",
-    "eval:compare": "tsx src/evaluate/run.ts --compare"
+    "eval": "tsx evaluate/run.ts",
+    "eval:compare": "tsx evaluate/run.ts --compare",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "echo 'Linting...' && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx tests/utils.test.ts && tsx tests/generate.test.ts",
+    "test:utils": "tsx tests/utils.test.ts",
+    "test:generate": "tsx tests/generate.test.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^1.0.0",
     "@ai-sdk/openai": "^1.0.0",
     "@ai-sdk/openai-compatible": "^2.0.13",
     "ai": "^6.0.39",
     "commander": "^12.0.0",
     "dotenv": "^16.4.5",
-    "fast-csv": "^5.0.1"
+    "pathe": "^1.1.2"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

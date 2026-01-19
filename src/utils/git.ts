@@ -3,6 +3,7 @@
  * 用于收集项目的 Git 状态信息，供 AI 理解项目上下文
  */
 import { execFileNoThrow } from './execFileNoThrow';
+import { resolve } from 'path';
 
 // ============================================================================
 // Internal Helpers (DRY)
@@ -616,7 +617,6 @@ export function validateDestinationPath(destination: string): {
   valid: boolean;
   error?: string;
 } {
-  const { resolve } = require('pathe');
   const normalizedDest = resolve(destination);
   const dangerousPaths = [
     '/etc',
@@ -791,7 +791,7 @@ export async function cloneRepository(
   const { promisify } = await import('util');
   const { spawn, execFile } = await import('child_process');
   const { existsSync, mkdirSync, rmSync } = await import('fs');
-  const { join, resolve } = await import('pathe');
+  const { join, resolve } = await import('path');
 
   let clonePath = '';
 
@@ -1151,6 +1151,70 @@ export async function getStagedDiff(cwd: string): Promise<string> {
 
   if (diff.length > MAX_DIFF_SIZE) {
     // If diff is too large, truncate and add a note
+    const truncatedDiff = diff.substring(0, MAX_DIFF_SIZE);
+    return (
+      truncatedDiff +
+      '\n\n[Diff truncated due to size. Total diff size: ' +
+      (diff.length / 1024).toFixed(2) +
+      'KB]'
+    );
+  }
+  return diff;
+}
+
+/**
+ * Get the diff for the last commit
+ * - Excludes common lockfiles and large file types
+ * - Limits diff size to prevent context overflow
+ */
+export async function getLastCommitDiff(cwd: string): Promise<string> {
+  const excludePatterns = [
+    ':!pnpm-lock.yaml',
+    ':!package-lock.json',
+    ':!yarn.lock',
+    ':!*.min.js',
+    ':!*.bundle.js',
+    ':!dist/**',
+    ':!build/**',
+    ':!*.gz',
+    ':!*.zip',
+    ':!*.tar',
+    ':!*.tgz',
+    ':!*.woff',
+    ':!*.woff2',
+    ':!*.ttf',
+    ':!*.png',
+    ':!*.jpg',
+    ':!*.jpeg',
+    ':!*.gif',
+    ':!*.ico',
+    ':!*.svg',
+    ':!*.pdf',
+  ];
+
+  const args = ['diff', 'HEAD^', 'HEAD', '--', ...excludePatterns];
+
+  const { code, stdout: diff, stderr } = await gitExec(cwd, args);
+
+  if (code !== 0) {
+    const errorMessage = stderr || 'Unknown error';
+
+    if (errorMessage.includes('bad revision') || errorMessage.includes("fatal: bad revision 'HEAD^'")) {
+      throw new Error(
+        'Failed to get last commit diff: No commits found or invalid Git revision',
+      );
+    }
+
+    if (errorMessage.includes('fatal: not a git repository')) {
+      throw new Error('Not a Git repository');
+    }
+
+    throw new Error(`Failed to get last commit diff: ${errorMessage}`);
+  }
+
+  const MAX_DIFF_SIZE = 100 * 1024;
+
+  if (diff.length > MAX_DIFF_SIZE) {
     const truncatedDiff = diff.substring(0, MAX_DIFF_SIZE);
     return (
       truncatedDiff +
