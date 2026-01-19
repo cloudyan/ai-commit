@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 import { program } from 'commander';
-import { generate } from './generate.js';
-import { getStagedDiff, getLastCommitDiff, isGitRepository, gitCommit } from './utils/git.js';
-import { config } from './config.js';
-import { getDefaultLanguage } from './utils.js';
+import { generate } from './generate';
+import { getStagedDiff, getLastCommitDiff, isGitRepository, gitCommit } from './utils/git';
+import { config } from './config';
+import { getDefaultLanguage } from './utils';
 
 program
   .name('ai-commit')

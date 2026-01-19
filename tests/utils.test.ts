@@ -4,7 +4,7 @@ import {
   formatCommitMessage,
   delay,
   withRetry,
-} from '../src/utils.js';
+} from '../src/utils';
 
 const tests: Array<{ name: string; fn: () => Promise<void> | void }> = [];
 

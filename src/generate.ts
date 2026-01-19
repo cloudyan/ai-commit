@@ -4,9 +4,9 @@
 // 新写法（ai-sdk v4+ 推荐）
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
-import { prompts } from './prompt.js';
-import { containsSensitiveInfo, formatCommitMessage, withRetry } from './utils.js';
-import { loadConfig, config } from './config.js';
+import { prompts } from './prompts';
+import { containsSensitiveInfo, formatCommitMessage, withRetry } from './utils';
+import { loadConfig, config } from './config';
 
 loadConfig();
 

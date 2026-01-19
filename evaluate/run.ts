@@ -1,10 +1,10 @@
-import { generate } from '../src/generate.js';
+import { generate } from '../src/generate';
 import * as fs from 'fs';
 import * as path from 'path';
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
 import { fileURLToPath } from 'node:url';
-import { config } from '../src/config.js';
+import { config } from '../src/config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
