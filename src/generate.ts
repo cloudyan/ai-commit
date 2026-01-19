@@ -7,6 +7,7 @@ import { generateText } from 'ai';
 import { prompts } from './prompts';
 import { containsSensitiveInfo, formatCommitMessage, withRetry } from './utils';
 import { loadConfig, config } from './config';
+import { getStagedDiff, getStagedFileList } from './utils/git';
 
 loadConfig();
 
@@ -51,14 +52,34 @@ export async function generate({
   };
   language = languageMap[language] || '中文';
 
-  const prompt = prompts[promptVer]
+  // const cwd = process.cwd();
+  // const fileList = await getStagedFileList(cwd);
+  const fileList = '';
+
+  const userPrompt = `
+# Staged files:
+${fileList}
+
+# Diffs:
+${diff}
+`;
+  const systemPrompt = prompts[promptVer]
     .replace('{{language}}', language)
     .replace('{{diff}}', diff);
 
   try {
     const { text } = await generateText({
       model: openai(model), // 可换成 claude/deepseek
-      prompt,
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,  // 系统提示词
+        },
+        {
+          role: 'user',
+          content: userPrompt,  // 用户提示词
+        }
+      ],
       maxOutputTokens: 5000,
       temperature: 0.3,
     });

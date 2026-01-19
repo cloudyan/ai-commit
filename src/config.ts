@@ -25,5 +25,5 @@ export const config = {
   openaiApiKey: () => requireEnv('OPENAI_API_KEY'),
   openaiBaseUrl: () => getEnv('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
   modelName: () => getEnv('MODEL_NAME', 'gpt-3.5-turbo'),
-  promptVersion: () => getEnv('PROMPT_VERSION', 'prompt_A'),
+  promptVersion: () => getEnv('PROMPT_VERSION', 'prompt_B'),
 };
